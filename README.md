@@ -1,11 +1,12 @@
-# BrowserConsoleVideo
-用JavaScript在浏览器控制台中输出观看视频（BadApple!!）
+# 用JavaScript在浏览器控制台中输出观看视频（BadApple!!）
 
 
-###思路
+### 思路
 原理很简单，就是获取视频的每一帧图像，然后Console中输出即可
+
 观看地址：https://www.xuyanwu.cn/BadApple/
-###代码
+
+### 代码
 ```html
 <!DOCTYPE >
 <html>
@@ -37,7 +38,7 @@
 
 	<body>
 		<video height="500" width="100%" id="video">
-			<source src="vedio/Bad Apple.mp4"></source>
+			<source src="vedio/Bad Apple.mp4"></source>	//替换成你自己的视频地址
 		</video>
 		<div>
 			<button id="play-pause" onclick="ChangeButtonText()">播放</button>
@@ -48,7 +49,8 @@
 		<script>
 			var video = document.getElementById("video");
 			var play = false;
-
+			
+			//控制播放或暂停视频
 			function ChangeButtonText() {
 				if(video.paused) {
 					document.getElementById("play-pause").innerText = "暂停";
@@ -71,12 +73,14 @@
 			}
 
 			function captureImage() {
+				//绘制并获取当前帧
 				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 				var src = canvas.toDataURL("image/png");
 				if(oldSrc !== src) {
+					//在控制台输出帧图片
 					console.log("%c+", "font-size: 1px;padding: " + (canvas.height / 2) +
 						"px " + (canvas.width / 2) + "px;background-image: url(" + src + ");background-size: contain;background-repeat: no-repeat;");
-					oldSrc = src
+					oldSrc = src;
 				}
 				if(play) {
 					setTimeout(captureImage, 0);
