@@ -1,0 +1,37 @@
+body {
+    text-align: center;
+}
+
+#playButton {
+    width: 100%;
+    max-width: 300px;
+    height: 40px;
+    background-color: #fff;
+    border: 1px solid #00c1de;
+    color: #00c1de;
+    cursor: pointer;
+    outline: none;
+}
+
+#playButton:hover {
+    background-color: #00c1de;
+    color: #fff;
+}
+.console{
+    padding-top: 10px;
+}
+
+.console .item{
+    padding: 10px;
+}
+
+#FPS,
+#useTime{
+    display: inline-block;
+    min-width: 30px;
+}
+
+label{
+    user-select: none;
+    cursor: pointer;
+}

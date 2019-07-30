@@ -1,85 +1,58 @@
-<!DOCTYPE >
+<!DOCTYPE>
 <html>
 
-	<head>
-		<meta charset="utf-8" />
-		<title>Bad Apple!!</title>
-	</head>
+<head>
+	<meta charset="utf-8" />
+	<title>Bad Apple!!</title>
+	<link rel="stylesheet" href="css/index.css" />
+	<script src="js/index.js" charset="UTF-8"></script>
+</head>
 
-	<style>
-		body {
-			text-align: center;
-		}
-		
-		#play-pause {
-			width: 100%;
-			max-width: 300px;
-			height: 40px;
-			margin: 20px;
-			background-color: #fff;
-			border: 1px solid #00c1de;
-			color: #00c1de;
-			cursor: pointer;
-		}
-		
-		#play-pause:hover {
-			background-color: #00c1de;
-			color: #fff;
-		}
-	</style>
+<body>
+	<video id="video" height="400px" width="533px" controls="controls">
+		<source src="video/Bad Apple.mp4"></source>
+	</video>
+	<canvas id="canvas" height="400px" width="533px" ></canvas>
 
-	<body>
-		<video height="500" width="100%" id="video">
-			<source src="vedio/Bad Apple.mp4"></source>
-		</video>
-
-		<div>
-			<button id="play-pause" onclick="ChangeButtonText()">播放</button>
+	<div class="console">
+		<div class="item">
+			耗时：<span id="useTimeEl">0</span>ms
+			帧数：<span id="FPSEl">0</span>
 		</div>
-		<div class="info">
+		<div class="item">
+			<button id="playButton">播放</button>
+		</div>
+		<div class="item">
+			<input id="writeToConsole" type="checkbox"/>
+			<label for="writeToConsole">在Console中输出</label>
+		</div>
+		<div class="item">
+			<input id="edge" type="checkbox"/>
+			<label for="edge">显示边缘</label>
+		</div>
+		<div class="item">
+			<input id="original" type="radio" name="handleType"/>
+			<label for="original">原版</label>&nbsp;&nbsp;&nbsp;
+			<input id="color" type="radio" name="handleType" checked="checked"/>
+			<label for="color">彩色</label>&nbsp;&nbsp;&nbsp;
+			<input id="rainbow" type="radio" name="handleType"/>
+			<label for="rainbow">彩虹</label>&nbsp;&nbsp;&nbsp;
+			<input id="photo" type="radio" name="handleType"/>
+			<label for="photo">照片</label>&nbsp;&nbsp;&nbsp;
+		</div>
+		<div class="item">
+			上传照片：<input id="file" type="file" accept="image/*"/>
+		</div>
+		<div class="item">
 			请按F12打开控制台Console标签页观看视频！
-          <br> <br>
-          源码地址：<a href="https://www.xuyanwu.cn/article/show/p/65">在浏览器控制台中看BadApple!!</a>
 		</div>
-
-		<script>
-			var video = document.getElementById("video");
-			var play = false;
-
-			function ChangeButtonText() {
-				if(video.paused) {
-					document.getElementById("play-pause").innerText = "暂停";
-					video.play();
-					play = true;
-					captureImage();
-				} else {
-					play = false;
-					video.pause();
-					document.getElementById("play-pause").innerText = "播放";
-				}
-			}
-
-			var canvas = document.createElement("canvas");
-			var ctx = canvas.getContext('2d');
-			var oldSrc = "";
-			video.oncanplay = function() {
-				canvas.width = video.height / video.videoHeight * video.videoWidth;
-				canvas.height = video.height;
-			}
-
-			function captureImage() {
-				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-				var src = canvas.toDataURL("image/png");
-				if(oldSrc !== src) {
-					console.log("%c+", "font-size: 1px;padding: " + (canvas.height / 2) +
-						"px " + (canvas.width / 2) + "px;background-image: url(" + src + ");background-size: contain;background-repeat: no-repeat;");
-					oldSrc = src
-				}
-				if(play) {
-					setTimeout(captureImage, 0);
-				}
-			};
-		</script>
-	</body>
+		<div class="item" style="color: #f00">
+			哔哩哔哩、微信、QQ等内置浏览器无法正常观看，请复制链接到其它浏览器中打开
+		</div>
+		<div class="item">
+			源码地址：<a href="https://www.xuyanwu.cn/article/show/p/65" target="_blank">在浏览器控制台中看BadApple!!</a>
+		</div>
+	</div>
+</body>
 
 </html>
