@@ -53,6 +53,8 @@ function getMainHandle(video, canvas) {
         "photo": getPhotoHandle("img/photo.jpg", canvas),
     }
 
+    var traceHandle = getTraceHandle();
+
     function run() {
         //记录时间帧数等信息
         infoHandle.record();
@@ -64,13 +66,17 @@ function getMainHandle(video, canvas) {
             var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
 
-            if (edge.checked){
+            if (edge.checked) {
                 edgeHandle(imageData)
             }
-                
+
 
             //选择对应的处理函数进行处理
             handleFuncMap[handleType](imageData, infoHandle);
+
+            if (trace.checked) {
+                traceHandle(imageData, infoHandle);
+            }
             //将处理后的数组放回到canvas中
             ctx.putImageData(imageData, 0, 0);
         }
@@ -305,5 +311,29 @@ function edgeHandle(imageData) {
             data[i + 1] = 0;
             data[i + 2] = 0;
         }
+    }
+}
+
+//痕迹处理器
+function getTraceHandle() {
+    var trace = null;   //上一帧数据
+
+    return function (imageData, infoHandle) {
+        if (trace === null) { trace = imageData.data; return; }
+
+        var step = 0.9 - infoHandle.getUseTime() / 1000;
+        if (step < 0) step = 0;
+        var data = imageData.data;
+
+        //遍历对比，如果背景为黑色，则显示上一帧数据，并进行淡化处理
+        for (var i = 0; i < data.length; i += 4) {
+            if (data[i] === 0.0 && data[i + 1] === 0.0 && data[i + 2] === 0.0) {
+                if (trace[i] > 0) data[i] = trace[i] * step;
+                if (trace[i + 1] > 0) data[i + 1] = trace[i + 1] * step;
+                if (trace[i + 2] > 0) data[i + 2] = trace[i + 2] * step;
+            }
+        }
+
+        trace = data;
     }
 }
