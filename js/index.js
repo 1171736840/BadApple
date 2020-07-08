@@ -324,7 +324,7 @@ function edgeHandle(imageData) {
     var copy = data.slice();
 
     for (var i = 0; i < data.length; i += 4) {
-        if (copy[i] > 128 && (copy[i - 4] < 128 || copy[i + 4] < 128 || copy[i - 4 * width] < 128 || copy[i + 4 * width] < 128)) {
+        if (copy[i] > 127 && (copy[i - 4] < 128 || copy[i + 4] < 128 || copy[i - 4 * width] < 128 || copy[i + 4 * width] < 128)) {
             data[i] = 255;
             data[i + 1] = 255;
             data[i + 2] = 255;
