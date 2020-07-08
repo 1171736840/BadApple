@@ -37,7 +37,9 @@ window.onload = function () {
     }
 }
 
-//主处理器，由主处理器进行总控制
+/**
+ * 主处理器，由主处理器进行总控制
+ */
 function getMainHandle(video, canvas) {
     //上一帧数据，输出到控制台中用得到
     var prevFrameData = null;
@@ -51,9 +53,11 @@ function getMainHandle(video, canvas) {
         "color": getColorHandle(),
         "rainbow": getRainbowHandle(canvas),
         "photo": getPhotoHandle("img/photo.jpg", canvas),
+        "original": _ => { }
     }
 
     var traceHandle = getTraceHandle();
+    var pixelateHandle = getPixelateHandle();
 
     function run() {
         //记录时间帧数等信息
@@ -61,25 +65,31 @@ function getMainHandle(video, canvas) {
         //将视频当前帧绘制到canvas中
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        if (handleType !== "original") {
-            //获取颜色数组
-            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        //获取颜色数组
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-
-            if (edge.checked) {
-                edgeHandle(imageData)
-            }
-
-
-            //选择对应的处理函数进行处理
-            handleFuncMap[handleType](imageData, infoHandle);
-
-            if (trace.checked) {
-                traceHandle(imageData, infoHandle);
-            }
-            //将处理后的数组放回到canvas中
-            ctx.putImageData(imageData, 0, 0);
+        //像素化
+        if (pixelate.checked) {
+            pixelateHandle(imageData)
         }
+
+        //显示边缘
+        if (edge.checked) {
+            edgeHandle(imageData)
+        }
+
+
+        //选择对应的处理函数进行处理
+        handleFuncMap[handleType](imageData, infoHandle);
+
+        //显示痕迹
+        if (trace.checked) {
+            traceHandle(imageData, infoHandle);
+        }
+
+        //将处理后的数组放回到canvas中
+        ctx.putImageData(imageData, 0, 0);
+
         //是否输出到浏览器控制台中
         if (writeToConsole.checked) {
             writeToConsloe();
@@ -117,7 +127,9 @@ function getMainHandle(video, canvas) {
     }
 }
 
-//帧数时间信息记录处理器
+/**
+ * 获取帧数时间信息记录处理器
+ */
 function getInfoHandle() {
     //上一帧到当前帧使用时长
     var useTime = 0;
@@ -153,7 +165,9 @@ function getInfoHandle() {
     }
 }
 
-//照片处理器
+/**
+ * 获取照片处理器
+ */
 function getPhotoHandle(src, canvas) {
     var photoData = null;
     //根据图片路径获取图片数据
@@ -193,7 +207,9 @@ function getPhotoHandle(src, canvas) {
     }
 }
 
-//彩色处理器
+/**
+ * 获取彩色处理器
+ */
 function getColorHandle() {
     var color = [255, 0, 0];
     return function (imageData, infoHandle) {
@@ -209,7 +225,9 @@ function getColorHandle() {
     }
 }
 
-//在原有颜色的基础上再增加一定的颜色
+/**
+ * 在原有颜色的基础上再增加一定的颜色
+ */
 function addColor(color, step) {
 
     //如果一次增加太多会导致通道颜色值溢出，要用递归分多次处理
@@ -264,7 +282,9 @@ function addColor(color, step) {
     return color;
 }
 
-//彩虹处理器
+/**
+ * 彩虹处理器
+ */
 function getRainbowHandle(canvas) {
     var colorData = null;
     !function () {
@@ -295,7 +315,9 @@ function getRainbowHandle(canvas) {
     }
 }
 
-//边缘处理器
+/**
+ * 边缘处理器
+ */
 function edgeHandle(imageData) {
     var data = imageData.data;
     var width = imageData.width;
@@ -314,7 +336,9 @@ function edgeHandle(imageData) {
     }
 }
 
-//痕迹处理器
+/**
+ * 获取痕迹处理器
+ */
 function getTraceHandle() {
     var trace = null;   //上一帧数据
 
@@ -335,5 +359,67 @@ function getTraceHandle() {
         }
 
         trace = data;
+    }
+}
+
+/**
+ * 像素化处理器
+ */
+function getPixelateHandle() {
+
+    /**
+     * 把每个像素均值化，以实现像素化效果
+     */
+    function averageRGB(data, width, offset, widthStep, heightStep) {
+        var red = 0;
+        var green = 0;
+        var blue = 0;
+        var total = 0;
+
+        for (var i = 0; i < widthStep * 4; i += 4) {
+            for (var j = 0; j < heightStep * 4; j += 4) {
+                red += data[offset + i + j * width];
+                green += data[offset + i + j * width + 1];
+                blue += data[offset + i + j * width + 2];
+                total++;
+            }
+        }
+
+        var avgRed = Math.floor(red / total);
+        var avgGreen = Math.floor(green / total);
+        var avgBlue = Math.floor(blue / total);
+
+        for (var i = 0; i < widthStep * 4; i += 4) {
+            for (var j = 0; j < heightStep * 4; j += 4) {
+                data[offset + i + j * width] = avgRed;
+                data[offset + i + j * width + 1] = avgGreen;
+                data[offset + i + j * width + 2] = avgBlue;
+            }
+        }
+    }
+
+
+    return function (imageData) {
+        var data = imageData.data;
+        var width = imageData.width;
+        var height = imageData.height;
+
+        var step = parseInt(pixelateRange.value);
+
+        var widthNum = parseInt(width / step);
+        var heightNum = parseInt(height / step);
+        if (width % step > 0) widthNum++;
+        if (height % step > 0) heightNum++;
+
+        var offset, widthStep, heightStep;
+        for (var i = 0; i < widthNum; i++) {
+            for (var j = 0; j < heightNum; j++) {
+                offset = i * step * 4 + j * width * 4 * step; //需要偏移的量
+                //如果块不够大则仅处理剩余部分
+                widthStep = Math.min(step, width - i * step);
+                heightStep = Math.min(step, height - j * step);
+                averageRGB(data, width, offset, widthStep, heightStep);
+            }
+        }
     }
 }
